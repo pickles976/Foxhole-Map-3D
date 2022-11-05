@@ -15,7 +15,8 @@ export function createGroundChunk(size, xOffset, yOffset) {
             () => console.log(`Failed to load ${xOffset}_${yOffset}_${size}.png`));
 
     const groundMat = new THREE.MeshStandardMaterial ({
-        color: Math.random() * 0xffffff,
+        // color: Math.random() * 0xffffff,
+        color: 0x009A17,
         // wireframe: true,
         displacementMap: disMap,
         displacementScale: 150,

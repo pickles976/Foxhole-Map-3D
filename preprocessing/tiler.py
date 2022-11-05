@@ -1,24 +1,27 @@
 import cv2
 import math
 
-img = cv2.imread("./resources/Godcrofts_HeightMap.png") # 512x512
+# img = cv2.imread("./resources/Godcrofts_HeightMap.png", cv2.IMREAD_GRAYSCALE) # 512x512
+# desired_size = 4096
 
-img_shape = img.shape
+
+img = cv2.imread("./resources/map_topography.png", cv2.IMREAD_GRAYSCALE) # 512x512
+desired_size = 16384
 
 img_scale = 128
 size = 256
 
-desired_size = 4096
 # pad original
-img = cv2.copyMakeBorder(img, 0, desired_size - img_shape[0], 0, desired_size - img_shape[1], cv2.BORDER_CONSTANT, None, value = 0)
+img = cv2.copyMakeBorder(img, 0, max(desired_size - img.shape[0], 0), 0, max(desired_size - img.shape[1], 0), cv2.BORDER_CONSTANT, None, value=255)
+img = img[0:desired_size, 0:desired_size]
 
 cv2.imwrite("./quadmaps/padded.png", img)
 
 # generate tiles for all zoom levels (0 is full detail)
-while (size <= img_shape[1] or size <= img_shape[0]):
+while (size <= img.shape[1] or size <= img.shape[0]):
 
-    x_size = int(math.ceil(img_shape[1]/(size * 1.0)))
-    y_size = int(math.ceil(img_shape[0]/(size * 1.0)))
+    x_size = int(math.ceil(img.shape[1]/(size * 1.0)))
+    y_size = int(math.ceil(img.shape[0]/(size * 1.0)))
 
     for i in range(y_size):
         for j in range(x_size):
@@ -26,7 +29,7 @@ while (size <= img_shape[1] or size <= img_shape[0]):
             y = y_size - i - 1
 
             # crop image within bounds
-            cropped_img = img[size*i:min(size*i+size, img_shape[0]), size*j:min(size*j+size, img_shape[1])]
+            cropped_img = img[size*i:min(size*i+size, img.shape[0]), size*j:min(size*j+size, img.shape[1])]
 
             # pad image
             if (cropped_img.shape[0] < size or cropped_img.shape[1] < size):
