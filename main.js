@@ -21,6 +21,8 @@ import { createGroundChunk } from './mesh.js';
 // sliders.add(sliderVals, 'vertTexture', 0, 1).onChange(updateGroundMat)
 // sliders.add(sliderVals, 'dispScale', 0, 200).onChange(updateGroundMat)
 
+const CHUNK_SIZE = 256
+
 // grab canvas
 const canvas = document.querySelector('#c');
 const renderer = new THREE.WebGLRenderer({canvas});
@@ -29,7 +31,7 @@ const renderer = new THREE.WebGLRenderer({canvas});
 const fov = 40;
 const aspect = 2;  // the canvas default
 const near = 0.1;
-const far = 10000;
+const far = 100000;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 camera.position.set(2048, 2048, 1024);
 camera.up.set(0, 0, 1);
@@ -41,22 +43,6 @@ controls.update();
 
 const scene = new THREE.Scene();
 
-// function updateGroundMat() {
-
-//     ground.material = new THREE.MeshStandardMaterial ({
-//         color: 0x00CC00,
-//         // wireframe: true,
-//         displacementMap: disMap,
-//         displacementScale: sliderVals.dispScale,
-//         flatShading: true,
-//     })
-// }
-
-// function updateGroundMesh() {
-//     ground.geometry = new THREE.PlaneGeometry(1000, 1000, sliderVals.widthSeg, sliderVals.heightSeg);
-//     updateGroundMat();
-// }
-
 function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
     const width = canvas.clientWidth;
@@ -66,12 +52,12 @@ function resizeRendererToDisplaySize(renderer) {
       renderer.setSize(width, height, false);
     }
     return needResize;
-  }
+}
 
 function render(time) {
     time *= 0.001;  // convert time to seconds
 
-    updateTerrain();
+    // updateTerrain();
 
     // fix buffer size
     if (resizeRendererToDisplaySize(renderer)) {
@@ -90,6 +76,53 @@ function render(time) {
     requestAnimationFrame(render);
 }
 
+function buildTree(xOffset, yOffset, size) {
+
+    if (size < CHUNK_SIZE){
+        return undefined
+    } 
+
+    const center = new Vector3((yOffset * size) / 2, (xOffset * size) / 2, 0) 
+
+    // const currentLOD = Math.sqrt(Math.floor(camera.position.distanceTo(center) / 2048))
+    const currentLOD = Math.sqrt(Math.floor(new Vector3(2500,0,0).distanceTo(center) / 2048))
+
+    // console.log(new Vector3(0,0,0).distanceTo(center) / 2048)
+
+    if (currentLOD < Math.floor(Math.log(size / CHUNK_SIZE))) {
+
+        const newXOffset = xOffset * 2
+        const newYOffset = yOffset * 2
+        const newSize = size / 2
+
+        // actual nodes
+        return {
+            xOffset,
+            yOffset,
+            size,
+            ne : buildTree(newXOffset + 1, newYOffset + 1, newSize),
+            nw: buildTree(newXOffset, newYOffset + 1, newSize),
+            se: buildTree(newXOffset + 1, newYOffset, newSize),
+            sw: buildTree(newXOffset, newYOffset, newSize),
+        }
+
+    }
+
+    const chunk = createGroundChunk(size, xOffset, yOffset, currentLOD)
+    scene.add(chunk)
+
+    console.log(currentLOD)
+
+    // render stuff
+    return {
+        chunk,
+        xOffset,
+        yOffset,
+        size
+    }
+    
+}
+
 // lighting
 const color = 0xFFFFFF;
 const intensity = 1;
@@ -104,52 +137,54 @@ const HEIGHT = 2560
 const WIDTH = 2560
 const SIZE = 256
 
-let terrain = {}
+buildTree(0,0,4096)
 
-// INITIALIZE EMPTY TERRAIN MAP
-for (let j = 0; j < WIDTH / SIZE; j++){
+// let terrain = {}
 
-    terrain[j] = {}
+// // INITIALIZE EMPTY TERRAIN MAP
+// for (let j = 0; j < WIDTH / SIZE; j++){
 
-    for (let i = 0; i < HEIGHT / SIZE; i++){
-        terrain[j][i] = {
-            LOD: 0,
-            chunk: {},
-        }
-    }
-}
+//     terrain[j] = {}
 
-function updateTerrain(){
-    const currentLOD = 1
+//     for (let i = 0; i < HEIGHT / SIZE; i++){
+//         terrain[j][i] = {
+//             LOD: 0,
+//             chunk: {},
+//         }
+//     }
+// }
 
-    // UPDATE IF LOD HAS CHANGED
-    for (let i = 0; i < HEIGHT / SIZE; i++){
-        for (let j = 0; j < WIDTH / SIZE; j++){
+// function updateTerrain(){
+//     const currentLOD = 1
 
-            const currentLOD = Math.floor(camera.position.distanceTo(new Vector3(j * SIZE, i * SIZE, 0)) / 2000)
+//     // UPDATE IF LOD HAS CHANGED
+//     for (let i = 0; i < HEIGHT / SIZE; i++){
+//         for (let j = 0; j < WIDTH / SIZE; j++){
 
-            if (terrain[j][i].LOD != currentLOD) {
+//             const currentLOD = Math.floor(camera.position.distanceTo(new Vector3(j * SIZE, i * SIZE, 0)) / 2000)
 
-                const chunk = createGroundChunk(SIZE, SIZE / (2 ** currentLOD), j, i)
-                scene.add(chunk)
+//             if (terrain[j][i].LOD != currentLOD) {
 
-                // dispose of old chunk
-                const object = scene.getObjectByProperty( 'uuid', terrain[j][i].chunk.uuid );
-                if (object) {
-                    object.geometry.dispose();
-                    object.material.dispose();
-                    scene.remove( object );
-                }
+//                 const chunk = createGroundChunk(SIZE, SIZE / (2 ** currentLOD), j, i)
+//                 scene.add(chunk)
 
-                terrain[j][i] = {
-                    LOD: currentLOD,
-                    chunk
-                }
-            }
+//                 // dispose of old chunk
+//                 const object = scene.getObjectByProperty( 'uuid', terrain[j][i].chunk.uuid );
+//                 if (object) {
+//                     object.geometry.dispose();
+//                     object.material.dispose();
+//                     scene.remove( object );
+//                 }
 
-            // terrain.push(chunk)
-        }
-    }
-}
+//                 terrain[j][i] = {
+//                     LOD: currentLOD,
+//                     chunk
+//                 }
+//             }
+
+//             // terrain.push(chunk)
+//         }
+//     }
+// }
 
 requestAnimationFrame(render)

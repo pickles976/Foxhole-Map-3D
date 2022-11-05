@@ -1,4 +1,5 @@
 import { Vector3 } from 'three';
+import { createGroundChunk } from './mesh';
 
 const MIN_SIZE = 256
 let position = camera.position;
@@ -11,7 +12,7 @@ function buildTree(xOffset, yOffset, width, depth) {
 
     const center = new Vector3(width / 2, height / 2, 0) 
 
-    const currentLOD = Math.floor(Math.log(16384 / position.distanceTo(center)))
+    const currentLOD = Math.sqrt(Math.floor(Math.log(position.distanceTo(center) / 2048)))
 
     if (currentLOD > depth) {
 
@@ -31,8 +32,15 @@ function buildTree(xOffset, yOffset, width, depth) {
 
     }
 
-    // render stuff
+    const chunk = createGroundChunk(width, xOffset, yOffset, currentLOD)
+    scene.add(chunk)
 
-    return undefined
+    // render stuff
+    return {
+        chunk,
+        xOffset,
+        yOffset,
+        width
+    }
     
 }

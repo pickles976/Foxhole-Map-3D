@@ -2,11 +2,15 @@ import * as THREE from 'three'
 
 const loader = new THREE.TextureLoader();
 
-export function createGroundChunk(size, segments, xOffset, yOffset,) {
+const SEGMENTS = 256;
+
+export function createGroundChunk(size, xOffset, yOffset, zOffset) {
 
     let disMap = loader
         .setPath('./resources/quadmaps/')
-        .load(`${xOffset}_${yOffset}_0.png`);
+        .load(`${xOffset}_${yOffset}_${zOffset}.png`);
+
+    // console.log(`${xOffset}_${yOffset}_${zOffset}.png`)
 
     const groundMat = new THREE.MeshStandardMaterial ({
         color: Math.random() * 0xffffff,
@@ -16,7 +20,7 @@ export function createGroundChunk(size, segments, xOffset, yOffset,) {
         flatShading: true,
     })
 
-    const groundGeo = new THREE.PlaneGeometry(size, size, segments, segments);
+    const groundGeo = new THREE.PlaneGeometry(size, size, SEGMENTS, SEGMENTS);
 
     const groundMesh = new THREE.Mesh(groundGeo, groundMat);
     groundMesh.position.y = yOffset * size;
