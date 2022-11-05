@@ -21,11 +21,13 @@ import { createGroundChunk } from './mesh.js';
 // sliders.add(sliderVals, 'vertTexture', 0, 1).onChange(updateGroundMat)
 // sliders.add(sliderVals, 'dispScale', 0, 200).onChange(updateGroundMat)
 
-const CHUNK_SIZE = 256
+const CHUNK_SIZE = 256 // Segments per chunk
+const MIN_ZOOM = 2048 // distance from tile where LOD = 0 (MAX DETAIL)
 
 // grab canvas
 const canvas = document.querySelector('#c');
 const renderer = new THREE.WebGLRenderer({canvas});
+const scene = new THREE.Scene();
 
 // camera
 const fov = 40;
@@ -41,7 +43,12 @@ const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 5, 0);
 controls.update();
 
-const scene = new THREE.Scene();
+// lighting
+const color = 0xFFFFFF;
+const intensity = 1;
+const light = new THREE.DirectionalLight(color, intensity);
+light.position.set(-1, 2, 4);
+scene.add(light);
 
 function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
@@ -58,6 +65,7 @@ function render(time) {
     time *= 0.001;  // convert time to seconds
 
     // updateTerrain();
+    updateTerrainTree(root)
 
     // fix buffer size
     if (resizeRendererToDisplaySize(renderer)) {
@@ -82,14 +90,15 @@ function buildTree(xOffset, yOffset, size) {
         return undefined
     } 
 
-    const center = new Vector3((yOffset * size) / 2, (xOffset * size) / 2, 0) 
+    const center = new Vector3((xOffset * size) + (size / 2), (yOffset * size) + (size / 2), 0) 
 
     // const currentLOD = Math.sqrt(Math.floor(camera.position.distanceTo(center) / 2048))
-    const currentLOD = Math.sqrt(Math.floor(new Vector3(2500,0,0).distanceTo(center) / 2048))
+    const currentLOD = Math.floor(Math.sqrt(camera.position.distanceTo(center) / MIN_ZOOM))
 
-    // console.log(new Vector3(0,0,0).distanceTo(center) / 2048)
+    const depth = Math.floor(Math.log(size / (CHUNK_SIZE / 2)))
 
-    if (currentLOD < Math.floor(Math.log(size / CHUNK_SIZE))) {
+    // if the desired LOD is lower than our current depth (chunks of size 256 are the highest zoom level, aka LOD 0)
+    if (currentLOD < depth) {
 
         const newXOffset = xOffset * 2
         const newYOffset = yOffset * 2
@@ -108,10 +117,9 @@ function buildTree(xOffset, yOffset, size) {
 
     }
 
-    const chunk = createGroundChunk(size, xOffset, yOffset, currentLOD)
+    const chunk = createGroundChunk(size, xOffset, yOffset, depth)
+    indexChunk(chunk, xOffset, yOffset, depth)
     scene.add(chunk)
-
-    console.log(currentLOD)
 
     // render stuff
     return {
@@ -123,68 +131,131 @@ function buildTree(xOffset, yOffset, size) {
     
 }
 
-// lighting
-const color = 0xFFFFFF;
-const intensity = 1;
-const light = new THREE.DirectionalLight(color, intensity);
-light.position.set(-1, 2, 4);
-scene.add(light);
+function updateTerrainTree(node) {
+
+    function removeChunk(){
+        // remove old chunk from scene
+        const object = scene.getObjectByProperty( 'uuid', node.chunk?.uuid );
+
+        if (object !== undefined){
+            object.geometry.dispose();
+            object.material.dispose();
+            scene.remove( object );
+        }
+
+        node.chunk = undefined
+    }
+
+    if (node?.size < CHUNK_SIZE){
+        return undefined
+    } 
+
+    const center = new Vector3((node.xOffset * node.size) + (node.size / 2), (node.yOffset * node.size) + (node.size / 2), 0) 
+
+    // const currentLOD = Math.sqrt(Math.floor(camera.position.distanceTo(center) / 2048))
+    const currentLOD = Math.floor(Math.sqrt(camera.position.distanceTo(center) / MIN_ZOOM))
+
+    const depth = Math.floor(Math.log(node.size / (CHUNK_SIZE / 2)))
+
+    // if the desired LOD is lower than our current depth (chunks of size 256 are the highest zoom level, aka LOD 0)
+    if (currentLOD < depth) {
+
+        removeChunk()
+
+        const newXOffset = node.xOffset * 2
+        const newYOffset = node.yOffset * 2
+        const newSize = node.size / 2
+
+        if (node.ne !== undefined) {
+            node.ne = updateTerrainTree(node.ne)
+        } else {
+            node.ne = buildTree(newXOffset + 1, newYOffset + 1, newSize)
+        }
+
+        if (node.nw !== undefined) {
+            node.nw = updateTerrainTree(node.nw)
+        } else {
+            node.nw = buildTree(newXOffset + 1, newYOffset + 1, newSize)
+        }
+
+        if (node.se !== undefined) {
+            node.se = updateTerrainTree(node.se)
+        } else {
+            node.se = buildTree(newXOffset + 1, newYOffset + 1, newSize)
+        }
+
+        if (node.sw !== undefined) {
+            node.sw = updateTerrainTree(node.sw)
+        } else {
+            node.sw = buildTree(newXOffset + 1, newYOffset + 1, newSize)
+        }
+
+    } else if (currentLOD === depth){
+
+        if (node.chunk === undefined){
+
+            let chunk = {}
+
+            if (chunkIndex[node.xOffset]?.[node.yOffset]?.depth !== undefined) {
+                chunk = chunkIndex[node.xOffset][node.yOffset][depth] // load previously-generated chunk
+            } else {
+                chunk = createGroundChunk(node.size, node.xOffset, node.yOffset, depth)
+                indexChunk(chunk, node.xOffset, node.yOffset, depth)
+            }
+
+            scene.add(chunk)
+            node.chunk = chunk
+        }
+    
+    } else {
+        removeChunk()
+
+        if (node.ne !== undefined) {
+            node.ne = updateTerrainTree(node.ne)
+        } 
+
+        if (node.nw !== undefined) {
+            node.nw = updateTerrainTree(node.nw)
+        } 
+
+        if (node.se !== undefined) {
+            node.se = updateTerrainTree(node.se)
+        } 
+
+        if (node.sw !== undefined) {
+            node.sw = updateTerrainTree(node.sw)
+        } 
+    }
+
+    return node
+
+}
+
+// index/cache the chunk in memory
+function indexChunk(chunk, x, y, z) {
+
+    if (chunkIndex[x] === undefined) {
+        chunkIndex[x] = {}
+    }
+
+    if (chunkIndex[x][y] === undefined) {
+        chunkIndex[x][y] = {}
+    }
+
+    if (chunkIndex[x][y][z] === undefined) {
+        chunkIndex[x][y][z] = {}
+    }
+
+    chunkIndex[x][y][z] = chunk
+
+}
 
 // Terrain Chunk array
 // const HEIGHT = 16128
 // const WIDTH  = 17664
-const HEIGHT = 2560
-const WIDTH = 2560
-const SIZE = 256
 
-buildTree(0,0,4096)
+let chunkIndex = {}
 
-// let terrain = {}
-
-// // INITIALIZE EMPTY TERRAIN MAP
-// for (let j = 0; j < WIDTH / SIZE; j++){
-
-//     terrain[j] = {}
-
-//     for (let i = 0; i < HEIGHT / SIZE; i++){
-//         terrain[j][i] = {
-//             LOD: 0,
-//             chunk: {},
-//         }
-//     }
-// }
-
-// function updateTerrain(){
-//     const currentLOD = 1
-
-//     // UPDATE IF LOD HAS CHANGED
-//     for (let i = 0; i < HEIGHT / SIZE; i++){
-//         for (let j = 0; j < WIDTH / SIZE; j++){
-
-//             const currentLOD = Math.floor(camera.position.distanceTo(new Vector3(j * SIZE, i * SIZE, 0)) / 2000)
-
-//             if (terrain[j][i].LOD != currentLOD) {
-
-//                 const chunk = createGroundChunk(SIZE, SIZE / (2 ** currentLOD), j, i)
-//                 scene.add(chunk)
-
-//                 // dispose of old chunk
-//                 const object = scene.getObjectByProperty( 'uuid', terrain[j][i].chunk.uuid );
-//                 if (object) {
-//                     object.geometry.dispose();
-//                     object.material.dispose();
-//                     scene.remove( object );
-//                 }
-
-//                 terrain[j][i] = {
-//                     LOD: currentLOD,
-//                     chunk
-//                 }
-//             }
-
-//             // terrain.push(chunk)
-//         }
-//     }
-// }
+let root = buildTree(0,0,2048)
 
 requestAnimationFrame(render)
