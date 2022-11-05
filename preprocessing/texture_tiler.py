@@ -1,21 +1,20 @@
 import cv2
 import math
 
-# img = cv2.imread("./resources/Godcrofts_HeightMap.png", cv2.IMREAD_GRAYSCALE) # 512x512
-# desired_size = 4096
-
-
-img = cv2.imread("./resources/map_topography.png", cv2.IMREAD_GRAYSCALE) # 512x512
+img = cv2.imread("./resources/map_texture.png") # 512x512
 desired_size = 16384
 
 img_scale = 128
 size = 256
 
+# scale to same size as heightmap
+img = cv2.resize(img, (16015, 17635), interpolation = cv2.INTER_AREA)
+
 # pad original
 img = cv2.copyMakeBorder(img, 0, max(desired_size - img.shape[0], 0), 0, max(desired_size - img.shape[1], 0), cv2.BORDER_CONSTANT, None, value=255)
 img = img[0:desired_size, 0:desired_size]
 
-cv2.imwrite("./quadmaps/padded.png", img)
+cv2.imwrite("./texturemaps/padded.png", img)
 
 # generate tiles for all zoom levels (0 is full detail)
 while (size <= img.shape[1] or size <= img.shape[0]):
@@ -36,7 +35,7 @@ while (size <= img.shape[1] or size <= img.shape[0]):
                 cropped_img = cv2.copyMakeBorder(cropped_img, 0, size - cropped_img.shape[0], 0, size - cropped_img.shape[1], cv2.BORDER_CONSTANT, None, value = 0)
             
             resized = cv2.resize(cropped_img, (img_scale, img_scale), interpolation = cv2.INTER_AREA)
-            cv2.imwrite("./quadmaps/" + str(x) + "_" + str(y) + "_" + str(size) + ".png", resized)
+            cv2.imwrite("./texturemaps/" + str(x) + "_" + str(y) + "_" + str(size) + ".png", resized)
 
     size *= 2
 

@@ -13,7 +13,7 @@ export function TilesToRender(params){
     let tilesToRender = new Set()
 
     tiles.forEach(tile => {
-        tilesToRender.add(`${tile.xOffset}_${tile.yOffset}_${tile.size}`);
+        tilesToRender.add(`${tile.xOffset}_${tile.zOffset}_${tile.size}`);
     });
     
     return tilesToRender
@@ -22,19 +22,19 @@ export function TilesToRender(params){
 
 function _GetTerrainTiles(params){
 
-    const tree = _QuadTree(params.xOffset, params.yOffset, params.size, params.position)
+    const tree = _QuadTree(params.xOffset, params.zOffset, params.size, params.position)
 
     return _GetLeaves(tree)
 
 }
 
-function _QuadTree(xOffset, yOffset, size, position) {
+function _QuadTree(xOffset, zOffset, size, position) {
 
     if (size < CHUNK_SIZE){
         return undefined
     } 
 
-    const center = new Vector3((xOffset * size) + (size / 2), (yOffset * size) + (size / 2), 0) 
+    const center = new Vector3((xOffset * size) + (size / 2), (zOffset * size) + (size / 2), 0) 
 
     const currentLOD = Math.floor(Math.sqrt(position.distanceTo(center) / MIN_ZOOM))
 
@@ -44,18 +44,18 @@ function _QuadTree(xOffset, yOffset, size, position) {
     if (currentLOD < depth) {
 
         const newXOffset = xOffset * 2
-        const newYOffset = yOffset * 2
+        const newZOffset = zOffset * 2
         const newSize = size / 2
 
         // actual nodes
         return {
             xOffset,
-            yOffset,
+            zOffset,
             size,
-            ne : _QuadTree(newXOffset + 1, newYOffset + 1, newSize, position),
-            nw: _QuadTree(newXOffset, newYOffset + 1, newSize, position),
-            se: _QuadTree(newXOffset + 1, newYOffset, newSize, position),
-            sw: _QuadTree(newXOffset, newYOffset, newSize, position),
+            ne : _QuadTree(newXOffset + 1, newZOffset + 1, newSize, position),
+            nw: _QuadTree(newXOffset, newZOffset + 1, newSize, position),
+            se: _QuadTree(newXOffset + 1, newZOffset, newSize, position),
+            sw: _QuadTree(newXOffset, newZOffset, newSize, position),
             leaf: false
         }
 
@@ -64,7 +64,7 @@ function _QuadTree(xOffset, yOffset, size, position) {
     // render stuff
     return {
         xOffset,
-        yOffset,
+        zOffset,
         size,
         leaf: true,
     }
