@@ -1,21 +1,12 @@
 TODO:
 
-1. Tile up the terrain with some sort of x,y system
-    a. Successfully break up tiles
-    b. load tiles based on x,y
+1. Switch quadtree to class-based implementation
 
-    c. fix camera position
+https://www.youtube.com/watch?v=YO_A5w_fxRQ
 
-4. Use distance to detemine LOD to use
-    a. Keep an index of x and y tiles
-    b. dynamically reload meshes based on LOD as distance changes
+2. Improve efficiency
 
-4. Create quadtree heightmap tiles
-    a. create quadtree of tiles from heightmap
-
-5. Load heightmaps based on LOD calculations
-
-6. Apply texturing to tiles
+3. Apply texturing to tiles
 
 A hex is 2197m × 1900m
 Heightmap is 16015 x 17635 pixels

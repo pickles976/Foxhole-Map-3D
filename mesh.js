@@ -2,13 +2,17 @@ import * as THREE from 'three'
 
 const loader = new THREE.TextureLoader();
 
-const SEGMENTS = 256;
+const SEGMENTS = 128;
 
-export function createGroundChunk(size, xOffset, yOffset, zOffset) {
+export function createGroundChunk(size, xOffset, yOffset) {
 
     let disMap = loader
         .setPath('./resources/quadmaps/')
-        .load(`${xOffset}_${yOffset}_${zOffset}.png`);
+        .load(
+            `${xOffset}_${yOffset}_${size}.png`,
+            () => {},
+            () => {},
+            () => console.log(`Failed to load ${xOffset}_${yOffset}_${size}.png`));
 
     const groundMat = new THREE.MeshStandardMaterial ({
         color: Math.random() * 0xffffff,
