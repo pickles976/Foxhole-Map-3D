@@ -5,10 +5,12 @@ import { FlyControls } from 'three/examples/jsm/controls/FlyControls'
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module'
 import { createGroundChunk } from './mesh.js';
 import { TilesToRender } from './quadtree.js';
+import Sky from './Sky.js'
 
 const MAP_SIZE = 16384
 
-let canvas, renderer, camera, scene, controls;
+let canvas, renderer, camera, scene, controls
+let sun, sky
 
 function init() {
 
@@ -18,6 +20,10 @@ function init() {
         canvas,
         logarithmicDepthBuffer: true,
     });
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.5;
+    // document.body.appendChild( renderer.domElement );
     // renderer.shadowMap.enabled = true;
     scene = new THREE.Scene();
 
@@ -26,7 +32,8 @@ function init() {
     const aspect = 2;  // the canvas default
     const near = 1;
     const far = 100000;
-    camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+    // camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+    camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 100, 2000000 );
     camera.position.set(MAP_SIZE / 2, MAP_SIZE / 2, 1024);
     camera.up.set(0, 0, 1);
     camera.lookAt(0, 0, 0);
@@ -50,6 +57,61 @@ function init() {
 
     const axesHelper = new THREE.AxesHelper( 500 );
     scene.add( axesHelper );
+
+}
+
+function initSky() {
+
+    // Add Sky
+    sky = Sky();
+    sky.scale.setScalar( 450000 );
+    scene.add( sky );
+
+    sun = new THREE.Vector3();
+
+    /// GUI
+
+    const effectController = {
+        turbidity: 10,
+        rayleigh: 3,
+        mieCoefficient: 0.005,
+        mieDirectionalG: 0.7,
+        elevation: 2,
+        azimuth: 180,
+        exposure: renderer.toneMappingExposure
+    };
+
+    function guiChanged() {
+
+        const uniforms = sky.material.uniforms;
+        uniforms[ 'turbidity' ].value = effectController.turbidity;
+        uniforms[ 'rayleigh' ].value = effectController.rayleigh;
+        uniforms[ 'mieCoefficient' ].value = effectController.mieCoefficient;
+        uniforms[ 'mieDirectionalG' ].value = effectController.mieDirectionalG;
+
+        const phi = THREE.MathUtils.degToRad( 90 - effectController.elevation );
+        const theta = THREE.MathUtils.degToRad( effectController.azimuth );
+
+        sun.setFromSphericalCoords( 1, phi, theta );
+
+        uniforms[ 'sunPosition' ].value.copy( sun );
+
+        renderer.toneMappingExposure = effectController.exposure;
+        renderer.render( scene, camera );
+
+    }
+
+    const gui = new GUI();
+
+    gui.add( effectController, 'turbidity', 0.0, 20.0, 0.1 ).onChange( guiChanged );
+    gui.add( effectController, 'rayleigh', 0.0, 4, 0.001 ).onChange( guiChanged );
+    gui.add( effectController, 'mieCoefficient', 0.0, 0.1, 0.001 ).onChange( guiChanged );
+    gui.add( effectController, 'mieDirectionalG', 0.0, 1, 0.001 ).onChange( guiChanged );
+    gui.add( effectController, 'elevation', 0, 90, 0.1 ).onChange( guiChanged );
+    gui.add( effectController, 'azimuth', - 180, 180, 0.1 ).onChange( guiChanged );
+    gui.add( effectController, 'exposure', 0, 1, 0.0001 ).onChange( guiChanged );
+
+    guiChanged();
 
 }
 
@@ -97,11 +159,11 @@ function initWater() {
         metalness: 0,
     })
 
-    const geo = new THREE.PlaneGeometry(MAP_SIZE, MAP_SIZE, 100, 100);
+    const geo = new THREE.PlaneGeometry(MAP_SIZE * 10, MAP_SIZE * 10, 100, 100);
     const water = new THREE.Mesh(geo, mat);
     water.position.x += MAP_SIZE / 2
     water.position.y += MAP_SIZE / 2
-    water.position.z = 4
+    water.position.z = 0.5
 
     scene.add(water)
 }
@@ -160,8 +222,10 @@ async function UpdateTerrain(){
 }
 
 init()
-
 UpdateTerrain()
 initWater()
+initSky()
+
+console.log(sky)
 
 requestAnimationFrame(render)
