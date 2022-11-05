@@ -5,22 +5,16 @@ import { FlyControls } from 'three/examples/jsm/controls/FlyControls'
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module'
 import { createGroundChunk } from './mesh.js';
 import { TilesToRender } from './quadtree.js';
-import {Sky} from './Sky.js'
-
 
 const MAP_SIZE = 16384
 
 let canvas, renderer, camera, scene;
-let sky, sun;
 
 // grab canvas
 canvas = document.querySelector('#c');
 renderer = new THREE.WebGLRenderer({
     canvas,
     logarithmicDepthBuffer: true,
-    outputEncoding: THREE.sRGBEncoding,
-    toneMapping: THREE.ACESFilmicToneMapping,
-    toneMappingExposure: 0.5
 });
 scene = new THREE.Scene();
 
@@ -31,7 +25,7 @@ const near = 1;
 const far = 100000;
 camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 camera.position.set(MAP_SIZE / 2, MAP_SIZE / 2, 1024);
-camera.up.set(0, 1, 0);
+camera.up.set(0, 0, 1);
 camera.lookAt(0, 0, 0);
 
 const controls = new FlyControls(camera, canvas);
@@ -86,64 +80,6 @@ async function render(time) {
     requestAnimationFrame(render)
 }
 
-function initSky() {
-
-    // Add Sky
-    sky = Sky();
-    sky.scale.setScalar( 450000 );
-    scene.add( sky );
-
-    console.log(sky)
-
-    sun = new THREE.Vector3();
-
-    /// GUI
-
-    const effectController = {
-        turbidity: 10,
-        rayleigh: 3,
-        mieCoefficient: 0.005,
-        mieDirectionalG: 0.7,
-        elevation: 2,
-        azimuth: 180,
-        exposure: renderer.toneMappingExposure
-    };
-
-    function guiChanged() {
-
-        const uniforms = sky.material.uniforms;
-        uniforms[ 'turbidity' ].value = effectController.turbidity;
-        uniforms[ 'rayleigh' ].value = effectController.rayleigh;
-        uniforms[ 'mieCoefficient' ].value = effectController.mieCoefficient;
-        uniforms[ 'mieDirectionalG' ].value = effectController.mieDirectionalG;
-
-        const phi = THREE.MathUtils.degToRad( 90 - effectController.elevation );
-        const theta = THREE.MathUtils.degToRad( effectController.azimuth );
-
-        sun.setFromSphericalCoords( 1, phi, theta );
-
-        uniforms[ 'sunPosition' ].value.copy( sun );
-
-        renderer.toneMappingExposure = effectController.exposure;
-        renderer.render( scene, camera );
-
-    }
-
-    const gui = new GUI();
-
-    gui.add( effectController, 'turbidity', 0.0, 20.0, 0.1 ).onChange( guiChanged );
-    gui.add( effectController, 'rayleigh', 0.0, 4, 0.001 ).onChange( guiChanged );
-    gui.add( effectController, 'mieCoefficient', 0.0, 0.1, 0.001 ).onChange( guiChanged );
-    gui.add( effectController, 'mieDirectionalG', 0.0, 1, 0.001 ).onChange( guiChanged );
-    gui.add( effectController, 'elevation', 0, 90, 0.1 ).onChange( guiChanged );
-    gui.add( effectController, 'azimuth', - 180, 180, 0.1 ).onChange( guiChanged );
-    gui.add( effectController, 'exposure', 0, 1, 0.0001 ).onChange( guiChanged );
-
-    guiChanged();
-
-}
-
-
 function initWater() {
 
     const mat = new THREE.MeshStandardMaterial ({
@@ -154,8 +90,8 @@ function initWater() {
     const geo = new THREE.PlaneGeometry(MAP_SIZE, MAP_SIZE, 100, 100);
     const water = new THREE.Mesh(geo, mat);
     water.position.x += MAP_SIZE / 2
-    water.position.z += MAP_SIZE / 2
-    water.position.y = 1.487
+    water.position.y += MAP_SIZE / 2
+    water.position.z = 1.487
 
     scene.add(water)
 }
@@ -173,7 +109,7 @@ async function UpdateTerrain(){
 
     const tilesToRender = TilesToRender({
         xOffset: 0,
-        zOffset: 0, 
+        yOffset: 0, 
         size: MAP_SIZE, 
         position: camera.position,
     })
@@ -208,7 +144,7 @@ async function UpdateTerrain(){
 
         const indices = tile.split("_") // use x,y,size to create chunk
         
-        const chunk = terrainCache[tile] === undefined ? createGroundChunk(indices[0], indices[1], indices[2]) : terrainCache[tile]
+        const chunk = terrainCache[tile] === undefined ? createGroundChunk(indices[2], indices[0], indices[1]) : terrainCache[tile]
 
         chunkMap[tile] = chunk.uuid // map x,y,size to chunk for future access and deletion
         scene.add(chunk)
@@ -217,7 +153,6 @@ async function UpdateTerrain(){
 }
 
 UpdateTerrain()
-initSky()
 initWater()
 
 requestAnimationFrame(render)
