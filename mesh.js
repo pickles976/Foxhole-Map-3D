@@ -30,6 +30,8 @@ export function createGroundChunk(size, xOffset, yOffset) {
         displacementMap: disMap,
         displacementScale: 150,
         flatShading: true,
+        roughness: 0.7,
+        metalness: 0,
     })
 
     const groundGeo = new THREE.PlaneGeometry(size, size, SEGMENTS, SEGMENTS);
@@ -37,6 +39,9 @@ export function createGroundChunk(size, xOffset, yOffset) {
     const groundMesh = new THREE.Mesh(groundGeo, groundMat);
     groundMesh.position.y = (yOffset * size) + (size / 2);
     groundMesh.position.x = (xOffset * size) + (size / 2);
+
+    // groundMesh.castShadow = true;
+    // groundMesh.receiveShadow = true;
 
     return groundMesh
 }

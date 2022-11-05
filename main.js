@@ -8,42 +8,50 @@ import { TilesToRender } from './quadtree.js';
 
 const MAP_SIZE = 16384
 
-let canvas, renderer, camera, scene;
+let canvas, renderer, camera, scene, controls;
 
-// grab canvas
-canvas = document.querySelector('#c');
-renderer = new THREE.WebGLRenderer({
-    canvas,
-    logarithmicDepthBuffer: true,
-});
-scene = new THREE.Scene();
+function init() {
 
-// camera
-const fov = 90;
-const aspect = 2;  // the canvas default
-const near = 1;
-const far = 100000;
-camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-camera.position.set(MAP_SIZE / 2, MAP_SIZE / 2, 1024);
-camera.up.set(0, 0, 1);
-camera.lookAt(0, 0, 0);
+    // grab canvas
+    canvas = document.querySelector('#c');
+    renderer = new THREE.WebGLRenderer({
+        canvas,
+        logarithmicDepthBuffer: true,
+    });
+    // renderer.shadowMap.enabled = true;
+    scene = new THREE.Scene();
 
-const controls = new FlyControls(camera, canvas);
-controls.movementSpeed = 100;
-controls.rollSpeed = Math.PI / 24;
-controls.autoForward = false;
-controls.dragToLook = true;
-controls.update(0.01);
+    // camera
+    const fov = 90;
+    const aspect = 2;  // the canvas default
+    const near = 1;
+    const far = 100000;
+    camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+    camera.position.set(MAP_SIZE / 2, MAP_SIZE / 2, 1024);
+    camera.up.set(0, 0, 1);
+    camera.lookAt(0, 0, 0);
 
-// lighting
-const color = 0xFFFFFF;
-const intensity = 1;
-const light = new THREE.DirectionalLight(color, intensity);
-light.position.set(-1, 2, 4);
-scene.add(light);
+    controls = new FlyControls(camera, canvas);
+    controls.movementSpeed = 100;
+    controls.rollSpeed = Math.PI / 24;
+    controls.autoForward = false;
+    controls.dragToLook = true;
+    controls.update(0.01);
 
-const axesHelper = new THREE.AxesHelper( 500 );
-scene.add( axesHelper );
+    // lighting
+    const color = 0xFFFFFF;
+    const intensity = 0.8;
+    const light = new THREE.DirectionalLight(color, intensity);
+    light.position.set(-1, 2, 4);
+    scene.add(light);
+
+    const ambient = new THREE.AmbientLight(color, 0.6);
+    scene.add(ambient);
+
+    const axesHelper = new THREE.AxesHelper( 500 );
+    scene.add( axesHelper );
+
+}
 
 function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
@@ -83,23 +91,22 @@ async function render(time) {
 function initWater() {
 
     const mat = new THREE.MeshStandardMaterial ({
-        color: 0xD4F1F9,
+        color: 0x006994 ,
         flatShading: false,
+        roughness: 0,
+        metalness: 0,
     })
 
     const geo = new THREE.PlaneGeometry(MAP_SIZE, MAP_SIZE, 100, 100);
     const water = new THREE.Mesh(geo, mat);
     water.position.x += MAP_SIZE / 2
     water.position.y += MAP_SIZE / 2
-    water.position.z = 1.487
+    water.position.z = 4
 
     scene.add(water)
 }
 
 // Terrain Chunk array
-// const HEIGHT = 16128
-// const WIDTH  = 17664
-
 let chunkIndex = new Set() // Active chunks by x_y_size key
 let chunkMap = {}   // mapping of x_y_size chunks to uuid
 let terrainCache = {}   // old meshes cached for quick access
@@ -151,6 +158,8 @@ async function UpdateTerrain(){
     })
 
 }
+
+init()
 
 UpdateTerrain()
 initWater()
