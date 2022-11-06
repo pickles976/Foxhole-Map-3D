@@ -6,14 +6,15 @@
 - [x] Better materials
 - [x] Try with full resolution (great success! very nice!)
 - [x] Skybox
+- [ ] Add map labels in 3D
 - [ ] Draw hexes
-- [ ] Add labels in 3D
 - [ ] water shader
 
 ### Improvements
 
 - [x] Script for generating tiles
 - [x] Share plane geometries for all meshes
+- [ ] Total War cam 
 - [ ] Fix the issue where Kalokai is cut off
 - [ ] Allow user to control resolution of images / detail of map
 

@@ -3,9 +3,10 @@ import { Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { FlyControls } from 'three/examples/jsm/controls/FlyControls'
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module'
-import { createGroundChunk } from './mesh.js';
-import { TilesToRender } from './quadtree.js';
-import Sky from './Sky.js'
+import { createGroundChunk } from './utils/mesh.js';
+import { TilesToRender } from './utils/quadtree.js';
+import Sky from './utils/Sky.js'
+import { CreateText } from './utils/text.js';
 
 const MAP_SIZE = 16384
 
@@ -222,6 +223,15 @@ UpdateTerrain()
 initWater()
 initSky()
 
-console.log(sky)
+const text = CreateText({
+    position: new Vector3(0, 1024, 0),
+    text: 'LIGMA BALLS',
+    size: 500,
+    height:  2,
+})
+
+console.log(text)
+
+scene.add(text)
 
 requestAnimationFrame(render)
