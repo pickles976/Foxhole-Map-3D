@@ -28,7 +28,7 @@ const Sky = function() {
     side: THREE.BackSide,
   });
 
-  return new THREE.Mesh(new THREE.SphereGeometry(1, 32, 15), material);
+  return new THREE.Mesh(new THREE.SphereGeometry(1, 32, 15), material)
 };
 
 Sky.prototype = new THREE.Mesh();

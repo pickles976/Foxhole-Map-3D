@@ -28,15 +28,10 @@ function init() {
     scene = new THREE.Scene();
 
     // camera
-    const fov = 90;
-    const aspect = 2;  // the canvas default
-    const near = 1;
-    const far = 100000;
-    // camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 100, 2000000 );
-    camera.position.set(MAP_SIZE / 2, MAP_SIZE / 2, 1024);
-    camera.up.set(0, 0, 1);
-    camera.lookAt(0, 0, 0);
+    camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 10, 2000000 );
+    camera.position.set(0, 1024, 0);
+    camera.up.set(0, 1, 0);
+    camera.lookAt(MAP_SIZE / 2, 0, MAP_SIZE / 2);
 
     controls = new FlyControls(camera, canvas);
     controls.movementSpeed = 100;
@@ -55,7 +50,7 @@ function init() {
     const ambient = new THREE.AmbientLight(color, 0.6);
     scene.add(ambient);
 
-    const axesHelper = new THREE.AxesHelper( 500 );
+    const axesHelper = new THREE.AxesHelper( 5000 );
     scene.add( axesHelper );
 
 }
@@ -76,8 +71,8 @@ function initSky() {
         rayleigh: 3,
         mieCoefficient: 0.005,
         mieDirectionalG: 0.7,
-        elevation: 2,
-        azimuth: 180,
+        elevation: 7.5,
+        azimuth: 56,
         exposure: renderer.toneMappingExposure
     };
 
@@ -107,7 +102,7 @@ function initSky() {
     gui.add( effectController, 'rayleigh', 0.0, 4, 0.001 ).onChange( guiChanged );
     gui.add( effectController, 'mieCoefficient', 0.0, 0.1, 0.001 ).onChange( guiChanged );
     gui.add( effectController, 'mieDirectionalG', 0.0, 1, 0.001 ).onChange( guiChanged );
-    gui.add( effectController, 'elevation', 0, 90, 0.1 ).onChange( guiChanged );
+    gui.add( effectController, 'elevation', 0, 180, 0.1 ).onChange( guiChanged );
     gui.add( effectController, 'azimuth', - 180, 180, 0.1 ).onChange( guiChanged );
     gui.add( effectController, 'exposure', 0, 1, 0.0001 ).onChange( guiChanged );
 
@@ -160,10 +155,11 @@ function initWater() {
     })
 
     const geo = new THREE.PlaneGeometry(MAP_SIZE * 10, MAP_SIZE * 10, 100, 100);
+    geo.rotateX(-Math.PI / 2); // this is how you can do it
     const water = new THREE.Mesh(geo, mat);
     water.position.x += MAP_SIZE / 2
-    water.position.y += MAP_SIZE / 2
-    water.position.z = 0.5
+    water.position.z += MAP_SIZE / 2
+    water.position.y = 0.5
 
     scene.add(water)
 }
@@ -178,7 +174,7 @@ async function UpdateTerrain(){
 
     const tilesToRender = TilesToRender({
         xOffset: 0,
-        yOffset: 0, 
+        zOffset: 0, 
         size: MAP_SIZE, 
         position: camera.position,
     })

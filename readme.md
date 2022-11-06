@@ -1,11 +1,17 @@
-TODO:
+# TODO:
+
+### Pretty things
 
 - [x] Texturing
 - [x] Better materials
-- [ ] Script for generating tiles
 - [ ] Try with full resolution
-- [ ] Skybox
+- [x] Skybox
 - [ ] Draw hexes
 - [ ] Add labels in 3D
 - [ ] water shader
+
+### Improvements
+
+- [ ] Script for generating tiles
+- [ ] Share plane geometries for all meshes
 
