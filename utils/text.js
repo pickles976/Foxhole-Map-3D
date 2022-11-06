@@ -2,28 +2,15 @@ import * as THREE from 'three'
 import { FontLoader } from 'three/examples/loaders/FontLoader'
 import { TextGeometry } from 'three/examples/geometries/TextGeometry'
 import { regionMappings, regionNames } from './regions.js';
+import { HEX_H, HEX_W, RATIO, SCALE, MAP_SIZE } from './hex.js';
 
 const TEXT_Y = 512
-
-// true hex sizes
-const HEX_H = 1900
-const HEX_W = 2197
-
-// true map size
-const RATIO = 1.1021839
-const MAP_H = HEX_H * 7
-const MAP_W = HEX_H / RATIO
-
-// 3D map size
-const MAP_SIZE = 16384
-
-// (IMAGE_H / MAP_H) * (MAP_SIZE / IMAGE_H) -> IMAGE_H drops out
-const SCALE = MAP_SIZE / MAP_H
-
 
 // Materials
 
 const loader = new FontLoader();
+
+let labels = []
 
 const meshMaterial = new THREE.MeshStandardMaterial ({
     color: 0xffffff,
@@ -48,12 +35,20 @@ export function CreateLabels(scene){
         _DrawText({
             scene,
             position: _OffsetToPosition(val),
-            text: key,
+            text: regionNames[key],
             size: 100,
             height:  0,
         })
 
     }
+}
+
+export function UpdateLabels(position){
+
+    labels.forEach((mesh) => {
+        mesh.lookAt(position)
+    })
+
 }
 
 function _OffsetToPosition(offset){
@@ -84,11 +79,13 @@ function _DrawText(params){
                     bevelSegments: params.bevelSegments ?? 5,  // ui: bevelSegments
                 })
 
-            geometry.rotateY(-Math.PI / 2)
+            // geometry.rotateY(-Math.PI / 2)
             geometry.center()
 
             const mesh = new THREE.Mesh(geometry, meshMaterial)
             mesh.position.set(...params.position)
+
+            labels.push(mesh)
         
             params.scene.add(mesh)
 

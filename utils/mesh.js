@@ -1,8 +1,7 @@
 import * as THREE from 'three'
+import { PLANE_SEGMENTS } from './hex.js';
 
 const loader = new THREE.TextureLoader();
-
-const SEGMENTS = 128;
 
 let planes = {}
 
@@ -26,7 +25,7 @@ export function createGroundChunk(size, xOffset, zOffset) {
 
     if (planes[size] === undefined){
         // share geometry for all planes
-        const groundGeo = new THREE.PlaneGeometry(size, size, SEGMENTS, SEGMENTS);
+        const groundGeo = new THREE.PlaneGeometry(size, size, PLANE_SEGMENTS, PLANE_SEGMENTS);
         groundGeo.rotateX(-Math.PI / 2); 
 
         planes[size] = groundGeo

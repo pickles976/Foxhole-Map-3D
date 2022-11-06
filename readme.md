@@ -1,23 +1,25 @@
-# TODO:
+# How to use:
 
-### Pretty things
+Must have python installed
 
-- [x] Texturing
-- [x] Better materials
-- [x] Try with full resolution (great success! very nice!)
-- [x] Skybox
-- [x] Add map labels in 3D
-- [ ] Make map labels billboard
-- [ ] Draw hexes (decals?)
-- [x] Add Fog around map
-- [ ] Replace fog with shader that makes ocean see through past a certain distance
-- [ ] water shader
+1. Run
 
-### Improvements
+```
+install.sh
+```
 
-- [x] Script for generating tiles
-- [x] Share plane geometries for all meshes
-- [x] Fix the issue where Kalokai is cut off
-- [ ] Total War cam 
-- [ ] Allow user to control resolution of images / detail of map
+2. Copy texture files from [here](www.google.com), copy them into the /preprocessing/resources folder
 
+3. Run 
+
+```bash
+generate.sh
+```
+
+4. Run
+
+```
+http-server .
+```
+
+5. In your browser, open up the provided url. Default is localhost:8080

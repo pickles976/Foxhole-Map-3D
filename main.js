@@ -5,11 +5,10 @@ import { FlyControls } from 'three/examples/jsm/controls/FlyControls'
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module'
 import { createGroundChunk } from './utils/mesh.js';
 import { TilesToRender } from './utils/quadtree.js';
-import { CreateLabels } from './utils/text.js';
+import { CreateLabels, UpdateLabels } from './utils/text.js';
 import { Water } from './utils/Water.js';
 import { Sky } from './utils/Sky.js'
-
-const MAP_SIZE = 16384
+import { MAP_SIZE } from './utils/hex.js';
 
 let canvas, renderer, camera, scene, controls
 let sun, sky, water
@@ -146,6 +145,7 @@ async function render(time) {
     renderer.render(scene, camera);
 
     UpdateTerrain()
+    UpdateLabels(camera.position)
     
     requestAnimationFrame(render)
 }
@@ -239,13 +239,6 @@ initWater()
 initSky()
 CreateLabels(scene)
 UpdateTerrain()
-
-const geometry = new THREE.BoxGeometry( 30, 30, 30 );
-const material = new THREE.MeshStandardMaterial( { roughness: 0 } );
-
-const mesh = new THREE.Mesh( geometry, material );
-mesh.position.y += 1024
-scene.add( mesh );
 
 // console.log(text)
 
