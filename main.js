@@ -6,7 +6,7 @@ import { GUI } from 'three/examples/jsm/libs/lil-gui.module'
 import { createGroundChunk } from './utils/mesh.js';
 import { TilesToRender } from './utils/quadtree.js';
 import Sky from './utils/Sky.js'
-import { CreateText } from './utils/text.js';
+import { DrawText } from './utils/text.js';
 
 const MAP_SIZE = 16384
 
@@ -223,15 +223,14 @@ UpdateTerrain()
 initWater()
 initSky()
 
-const text = CreateText({
+DrawText({
+    scene,
     position: new Vector3(0, 1024, 0),
     text: 'LIGMA BALLS',
-    size: 500,
-    height:  2,
+    size: 100,
+    height:  0,
 })
 
-console.log(text)
-
-scene.add(text)
+// console.log(text)
 
 requestAnimationFrame(render)
