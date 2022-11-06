@@ -46,8 +46,12 @@ function init() {
 
     // lighting
     const color = 0xFFFFFF;
+    const intensity = 0.6;
+    const light = new THREE.DirectionalLight(color, intensity);
+    light.position.set(-1, 2, 4);
+    scene.add(light);
 
-    const ambient = new THREE.AmbientLight(color, 0.1);
+    const ambient = new THREE.AmbientLight(color, 0.3);
     scene.add(ambient);
 
     const axesHelper = new THREE.AxesHelper( 5000 );
