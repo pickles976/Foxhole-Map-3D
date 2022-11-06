@@ -1,14 +1,18 @@
 import cv2
 import math
 
-img = cv2.imread("./resources/map_topography.png", cv2.IMREAD_GRAYSCALE) # 512x512
+img = cv2.imread("./resources/map_topography.png", cv2.IMREAD_GRAYSCALE)
 desired_size = 16384
 
 img_scale = 128
 size = 256
 
+# # scale to desired size
+x_scale = desired_size / img.shape[0] 
+img = cv2.resize(img, (round(img.shape[1] * x_scale), 16384), interpolation = cv2.INTER_AREA)
+
 # pad original
-img = cv2.copyMakeBorder(img, 0, max(desired_size - img.shape[0], 0), 0, max(desired_size - img.shape[1], 0), cv2.BORDER_CONSTANT, None, value=255)
+img = cv2.copyMakeBorder(img, 0, max(desired_size - img.shape[0], 0), 0, max(desired_size - img.shape[1], 0), cv2.BORDER_CONSTANT, None, value=0)
 img = img[0:desired_size, 0:desired_size]
 
 cv2.imwrite("./quadmaps/padded.png", img)

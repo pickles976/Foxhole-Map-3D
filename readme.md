@@ -15,6 +15,6 @@
 - [x] Script for generating tiles
 - [x] Share plane geometries for all meshes
 - [ ] Total War cam 
-- [ ] Fix the issue where Kalokai is cut off
+- [x] Fix the issue where Kalokai is cut off
 - [ ] Allow user to control resolution of images / detail of map
 

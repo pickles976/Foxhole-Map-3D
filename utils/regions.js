@@ -1,4 +1,4 @@
-region_mappings = {
+export const regionMappings = {
     "BASIN" : [0,3],
     "SPEAKING" : [-0.75,2.5], 
     "HOWL" : [0.75,2.5],
@@ -38,7 +38,7 @@ region_mappings = {
     "KALOKAI": [0,-3],
 }
 
-region_names = {
+export const regionNames = {
     "BASIN" : "Basin Sionnach",
     "SPEAKING" : "Speaking Woods", 
     "HOWL" : "Howl County",

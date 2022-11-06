@@ -1,17 +1,18 @@
 import cv2
 import math
 
-img = cv2.imread("./resources/map_texture.png") # 512x512
+img = cv2.imread("./resources/map_texture.png")
 desired_size = 16384
 
 img_scale = 128
 size = 256
 
 # scale to same size as heightmap
-img = cv2.resize(img, (16015, 17635), interpolation = cv2.INTER_AREA)
+# 16384, 14879
+img = cv2.resize(img, (14879, 16384), interpolation = cv2.INTER_AREA)
 
 # pad original
-img = cv2.copyMakeBorder(img, 0, max(desired_size - img.shape[0], 0), 0, max(desired_size - img.shape[1], 0), cv2.BORDER_CONSTANT, None, value=255)
+img = cv2.copyMakeBorder(img, 0, max(desired_size - img.shape[0], 0), 0, max(desired_size - img.shape[1], 0), cv2.BORDER_CONSTANT, None, value=0)
 img = img[0:desired_size, 0:desired_size]
 
 cv2.imwrite("./texturemaps/padded.png", img)
