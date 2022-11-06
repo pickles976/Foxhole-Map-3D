@@ -4,7 +4,7 @@
 
 - [x] Texturing
 - [x] Better materials
-- [ ] Try with full resolution
+- [x] Try with full resolution (great success! very nice!)
 - [x] Skybox
 - [ ] Draw hexes
 - [ ] Add labels in 3D
@@ -12,6 +12,8 @@
 
 ### Improvements
 
-- [ ] Script for generating tiles
-- [ ] Share plane geometries for all meshes
+- [x] Script for generating tiles
+- [x] Share plane geometries for all meshes
+- [ ] Fix the issue where Kalokai is cut off
+- [ ] Allow user to control resolution of images / detail of map
 
