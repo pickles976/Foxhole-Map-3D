@@ -33,15 +33,12 @@ export function createGroundChunk(size, xOffset, zOffset) {
     }
 
     const groundMat = new THREE.MeshStandardMaterial ({
-        // color: Math.random() * 0xffffff,
-        // color: 0x009A17,
-        // wireframe: true,
         map: tex,
         displacementMap: disMap,
         displacementScale: 100,
         flatShading: true,
         roughness: 0.7,
-        metalness: 0,
+        metalness: 0.8,
     })
 
     const groundMesh = new THREE.Mesh(planes[size], groundMat);

@@ -7,6 +7,7 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
+        <script async="" src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
         <script type="importmap">
             {
               "imports": {
@@ -16,7 +17,8 @@
                 "three/examples/jsm/libs/lil-gui.module":"./node_modules/three/examples/jsm/libs/lil-gui.module.min.js",
                 "three/examples/loaders/TGALoader": "./node_modules/three/examples/jsm/loaders/TGALoader.js",
                 "three/examples/loaders/FontLoader": "./node_modules/three/examples/jsm/loaders/FontLoader.js",
-                "three/examples/geometries/TextGeometry": "./node_modules/three/examples/jsm/geometries/TextGeometry.js"
+                "three/examples/geometries/TextGeometry": "./node_modules/three/examples/jsm/geometries/TextGeometry.js",
+                "three/examples/libs/stats.module": "./node_modules/three/examples/jsm/libs/stats.module.js"
               }
             }
         </script>
@@ -26,6 +28,6 @@
     <body>
         <script src="main.js" type="module" async defer></script>
         Foxhole Map 3D
-        <canvas id="c"></canvas>
+        <canvas id="c" data-engine="three.js r146"></canvas>
     </body>
 </html>

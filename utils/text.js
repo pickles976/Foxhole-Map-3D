@@ -3,19 +3,6 @@ import { FontLoader } from 'three/examples/loaders/FontLoader'
 import { TextGeometry } from 'three/examples/geometries/TextGeometry'
 import { regionMappings, regionNames } from './regions.js';
 
-const loader = new FontLoader();
-
-const meshMaterial = new THREE.MeshStandardMaterial ({
-    color: Math.random() * 0xffffff,
-    flatShading: true,
-    roughness: 0.7,
-    metalness: 0,
-})
-
-const spriteMaterial = new THREE.SpriteMaterial({
-    color: Math.random() * 0xffffff,
-})
-
 const TEXT_Y = 512
 
 // true hex sizes
@@ -33,12 +20,30 @@ const MAP_SIZE = 16384
 // (IMAGE_H / MAP_H) * (MAP_SIZE / IMAGE_H) -> IMAGE_H drops out
 const SCALE = MAP_SIZE / MAP_H
 
+
+// Materials
+
+const loader = new FontLoader();
+
+const meshMaterial = new THREE.MeshStandardMaterial ({
+    color: 0xffffff,
+    flatShading: true,
+    roughness: 0,
+    metalness: 0,
+    emissive: 0xffffff,
+    emissiveIntensity: 5.0,
+})
+
+const spriteMaterial = new THREE.SpriteMaterial({
+    color: Math.random() * 0xffffff,
+})
+
 export function CreateLabels(scene){
 
     for(const key in regionMappings){
 
         const val = regionMappings[key]
-        console.log(key, val)
+        // console.log(key, val)
 
         _DrawText({
             scene,

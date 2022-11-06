@@ -5,13 +5,14 @@ import { FlyControls } from 'three/examples/jsm/controls/FlyControls'
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module'
 import { createGroundChunk } from './utils/mesh.js';
 import { TilesToRender } from './utils/quadtree.js';
-import Sky from './utils/Sky.js'
 import { CreateLabels } from './utils/text.js';
+import { Water } from './utils/Water.js';
+import { Sky } from './utils/Sky.js'
 
 const MAP_SIZE = 16384
 
 let canvas, renderer, camera, scene, controls
-let sun, sky
+let sun, sky, water
 
 function init() {
 
@@ -27,6 +28,8 @@ function init() {
     // document.body.appendChild( renderer.domElement );
     // renderer.shadowMap.enabled = true;
     scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0xEBE2DB, 0.00003);
+
 
     // camera
     camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 10, 2000000 );
@@ -43,12 +46,8 @@ function init() {
 
     // lighting
     const color = 0xFFFFFF;
-    const intensity = 0.8;
-    const light = new THREE.DirectionalLight(color, intensity);
-    light.position.set(-1, 2, 4);
-    scene.add(light);
 
-    const ambient = new THREE.AmbientLight(color, 0.6);
+    const ambient = new THREE.AmbientLight(color, 0.1);
     scene.add(ambient);
 
     const axesHelper = new THREE.AxesHelper( 5000 );
@@ -58,57 +57,55 @@ function init() {
 
 function initSky() {
 
-    // Add Sky
-    sky = Sky();
-    sky.scale.setScalar( 450000 );
+     sky = new Sky();
+    sky.scale.setScalar( 100000 );
     scene.add( sky );
+
+    const skyUniforms = sky.material.uniforms;
+
+    skyUniforms[ 'turbidity' ].value = 10;
+    skyUniforms[ 'rayleigh' ].value = 2;
+    skyUniforms[ 'mieCoefficient' ].value = 0.005;
+    skyUniforms[ 'mieDirectionalG' ].value = 0.8;
+
+    const parameters = {
+        elevation: 52.5,
+        azimuth: 56
+    };
+
+    const pmremGenerator = new THREE.PMREMGenerator( renderer );
+    let renderTarget;
 
     sun = new THREE.Vector3();
 
-    /// GUI
+    function updateSun() {
 
-    const effectController = {
-        turbidity: 10,
-        rayleigh: 3,
-        mieCoefficient: 0.005,
-        mieDirectionalG: 0.7,
-        elevation: 7.5,
-        azimuth: 56,
-        exposure: renderer.toneMappingExposure
-    };
-
-    function guiChanged() {
-
-        const uniforms = sky.material.uniforms;
-        uniforms[ 'turbidity' ].value = effectController.turbidity;
-        uniforms[ 'rayleigh' ].value = effectController.rayleigh;
-        uniforms[ 'mieCoefficient' ].value = effectController.mieCoefficient;
-        uniforms[ 'mieDirectionalG' ].value = effectController.mieDirectionalG;
-
-        const phi = THREE.MathUtils.degToRad( 90 - effectController.elevation );
-        const theta = THREE.MathUtils.degToRad( effectController.azimuth );
+        const phi = THREE.MathUtils.degToRad( 90 - parameters.elevation );
+        const theta = THREE.MathUtils.degToRad( parameters.azimuth );
 
         sun.setFromSphericalCoords( 1, phi, theta );
 
-        uniforms[ 'sunPosition' ].value.copy( sun );
+        sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
+        water.material.uniforms[ 'sunDirection' ].value.copy( sun ).normalize();
 
-        renderer.toneMappingExposure = effectController.exposure;
-        renderer.render( scene, camera );
+        if ( renderTarget !== undefined ) renderTarget.dispose();
+
+        renderTarget = pmremGenerator.fromScene( sky );
+
+        scene.environment = renderTarget.texture;
 
     }
 
+    updateSun();
+
+    // GUI
+
     const gui = new GUI();
 
-    gui.add( effectController, 'turbidity', 0.0, 20.0, 0.1 ).onChange( guiChanged );
-    gui.add( effectController, 'rayleigh', 0.0, 4, 0.001 ).onChange( guiChanged );
-    gui.add( effectController, 'mieCoefficient', 0.0, 0.1, 0.001 ).onChange( guiChanged );
-    gui.add( effectController, 'mieDirectionalG', 0.0, 1, 0.001 ).onChange( guiChanged );
-    gui.add( effectController, 'elevation', 0, 180, 0.1 ).onChange( guiChanged );
-    gui.add( effectController, 'azimuth', - 180, 180, 0.1 ).onChange( guiChanged );
-    gui.add( effectController, 'exposure', 0, 1, 0.0001 ).onChange( guiChanged );
-
-    guiChanged();
-
+    const folderSky = gui.addFolder( 'Sky' );
+    folderSky.add( parameters, 'elevation', 0, 90, 0.1 ).onChange( updateSun );
+    folderSky.add( parameters, 'azimuth', - 180, 180, 0.1 ).onChange( updateSun );
+    folderSky.open();
 }
 
 function resizeRendererToDisplaySize(renderer) {
@@ -138,6 +135,9 @@ async function render(time) {
     const canvas = renderer.domElement;
     camera.aspect = canvas.clientWidth / canvas.clientHeight;
     camera.updateProjectionMatrix();
+
+    // water
+    water.material.uniforms[ 'time' ].value += 1.0 / 60.0;
    
     renderer.render(scene, camera);
 
@@ -148,21 +148,33 @@ async function render(time) {
 
 function initWater() {
 
-    const mat = new THREE.MeshStandardMaterial ({
-        color: 0x006994 ,
-        flatShading: false,
-        roughness: 0,
-        metalness: 0,
-    })
+    const waterGeometry = new THREE.PlaneGeometry( MAP_SIZE * 10, MAP_SIZE * 10, 100, 100 );
 
-    const geo = new THREE.PlaneGeometry(MAP_SIZE * 10, MAP_SIZE * 10, 100, 100);
-    geo.rotateX(-Math.PI / 2); // this is how you can do it
-    const water = new THREE.Mesh(geo, mat);
+    water = new Water(
+        waterGeometry,
+        {
+            textureWidth: 2048,
+            textureHeight: 2048,
+            waterNormals: new THREE.TextureLoader().load( './resources/waternormals.jpg', function ( texture ) {
+
+                texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
+            } ),
+            sunDirection: new THREE.Vector3(),
+            sunColor: 0xffffff,
+            waterColor: 0x001e0f,
+            distortionScale: 8,
+            fog: scene.fog !== undefined
+        }
+    )
+
     water.position.x += MAP_SIZE / 2
     water.position.z += MAP_SIZE / 2
     water.position.y = 0.5
 
-    scene.add(water)
+    water.rotation.x = - Math.PI / 2;
+
+    scene.add( water );
 }
 
 // Terrain Chunk array
@@ -219,10 +231,17 @@ async function UpdateTerrain(){
 }
 
 init()
-UpdateTerrain()
 initWater()
 initSky()
 CreateLabels(scene)
+UpdateTerrain()
+
+const geometry = new THREE.BoxGeometry( 30, 30, 30 );
+const material = new THREE.MeshStandardMaterial( { roughness: 0 } );
+
+const mesh = new THREE.Mesh( geometry, material );
+mesh.position.y += 1024
+scene.add( mesh );
 
 // console.log(text)
 
