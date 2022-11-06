@@ -16,17 +16,16 @@ const spriteMaterial = new THREE.SpriteMaterial({
     color: Math.random() * 0xffffff,
 })
 
+const TEXT_Y = 512
+
 // true hex sizes
 const HEX_H = 1900
 const HEX_W = 2197
 
 // true map size
+const RATIO = 1.1021839
 const MAP_H = HEX_H * 7
-const MAP_W = HEX_H / 1.1021839
-
-// image size
-const IMAGE_H = 17635
-const IMAGE_W = 16015
+const MAP_W = HEX_H / RATIO
 
 // 3D map size
 const MAP_SIZE = 16384
@@ -43,13 +42,24 @@ export function CreateLabels(scene){
 
         _DrawText({
             scene,
-            position: new THREE.Vector3(0, 1024, 0),
+            position: _OffsetToPosition(val),
             text: key,
             size: 100,
             height:  0,
         })
 
     }
+}
+
+function _OffsetToPosition(offset){
+
+    let x = (MAP_SIZE / 2)
+    let z = (MAP_SIZE / RATIO / 2)
+
+    x += offset[1] * HEX_H * SCALE
+    z += offset[0] * HEX_W * SCALE
+
+    return new THREE.Vector3(x, TEXT_Y, z)
 }
 
 function _DrawText(params){
@@ -69,6 +79,8 @@ function _DrawText(params){
                     bevelSegments: params.bevelSegments ?? 5,  // ui: bevelSegments
                 })
 
+            geometry.rotateY(-Math.PI / 2)
+            geometry.center()
 
             const mesh = new THREE.Mesh(geometry, meshMaterial)
             mesh.position.set(...params.position)

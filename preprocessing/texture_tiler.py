@@ -7,7 +7,7 @@ desired_size = 16384
 img_scale = 128
 size = 256
 
-# scale to same size as heightmap
+# scale to same size as unpadded heightmap
 # 16384, 14879
 img = cv2.resize(img, (14879, 16384), interpolation = cv2.INTER_AREA)
 
