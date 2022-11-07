@@ -20,6 +20,6 @@
 - [x] Share plane geometries for all meshes
 - [x] Fix the issue where Kalokai is cut off
 - [x] Host tiles online
-- [ ] Organize into static project
-- [ ] Host site online
+- [x] Organize into static project
+- [x] Host site online
 - [ ] Total War cam 

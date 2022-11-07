@@ -52,8 +52,9 @@ export function UpdateLabels(position){
 
 function _DrawText(params){
 
+    
     loader
-        .setPath('./node_modules/three/examples/fonts/')
+        .setPath('./static/fonts/')
         .load('helvetiker_regular.typeface.json', (font) => {
             const geometry = new TextGeometry(params.text ?? "ERROR: TEXT NOT FOUND", 
                 {
