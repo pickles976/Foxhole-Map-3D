@@ -156,7 +156,7 @@ function initWater() {
         {
             textureWidth: 2048,
             textureHeight: 2048,
-            waterNormals: new THREE.TextureLoader().load( './resources/waternormals.jpg', function ( texture ) {
+            waterNormals: new THREE.TextureLoader().load( './static/images/waternormals.jpg', function ( texture ) {
 
                 texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
