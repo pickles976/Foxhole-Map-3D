@@ -5,10 +5,18 @@ const loader = new THREE.TextureLoader();
 
 let planes = {}
 
+const LOCAL = false
+
+const localHeightMaps = './resources/heightmaps/'
+const localTextureMaps = './resources/textures/'
+
+const remoteHeightMaps = 'https://raw.githubusercontent.com/pickles976/Foxhole-Map-3D-Tiles/main/heightmaps/'
+const remoteTextureMaps = 'https://raw.githubusercontent.com/pickles976/Foxhole-Map-3D-Tiles/main/texturemaps/'
+
 export function createGroundChunk(size, xOffset, zOffset) {
 
     let disMap = loader
-        .setPath('./resources/quadmaps/')
+        .setPath(LOCAL ? localHeightMaps : remoteHeightMaps)
         .load(
             `${zOffset}_${xOffset}_${size}.png`,
             () => {},
@@ -16,7 +24,7 @@ export function createGroundChunk(size, xOffset, zOffset) {
             () => console.log(`Failed to load heightmap: ${zOffset}_${xOffset}_${size}.png`));
 
     let tex = loader
-        .setPath('./resources/textures/')
+        .setPath(LOCAL ? localTextureMaps : remoteTextureMaps)
         .load(
             `${zOffset}_${xOffset}_${size}.png`,
             () => {},

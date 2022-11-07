@@ -5,11 +5,11 @@ import { FlyControls } from 'three/examples/jsm/controls/FlyControls'
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module'
 import { createGroundChunk } from './utils/mesh.js';
 import { TilesToRender } from './utils/quadtree.js';
-import { CreateHexagons, CreateLabels, UpdateLabels } from './utils/text.js';
+import { CreateLabels, UpdateLabels } from './utils/text.js';
 import { Water } from './utils/Water.js';
 import { Sky } from './utils/Sky.js'
 import { MAP_SIZE } from './utils/config.js';
-import { CreateHexagon } from './utils/hexagon.js';
+import { CreateHexagons } from './utils/hexagon.js';
 
 let canvas, renderer, camera, scene, controls
 let sun, sky, water
@@ -193,6 +193,8 @@ async function UpdateTerrain(){
         size: MAP_SIZE, 
         position: camera.position,
     })
+
+    console.log(tilesToRender.size)
 
     let tilesToDelete = [...chunkIndex].filter((x) => !tilesToRender.has(x))
     let newTiles = [...tilesToRender].filter((x) => !chunkIndex.has(x))

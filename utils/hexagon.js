@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 import { HEX_H, SCALE } from './config.js';
+import { regionMappings, regionNames } from './regions.js';
+import { OffsetToPosition } from './utils.js';
 
 const SIDES = 6
 const HEIGHT = 100
@@ -14,8 +16,18 @@ const meshMaterial = new THREE.MeshPhongMaterial ({
     emissiveIntensity: 5.0,
 })
 
-export function CreateHexagon(scene){
-    return _CreateHexagon(HEX_H * SCALE)
+//TODO: GET THIS OUT OF HERE
+export function CreateHexagons(scene){
+    for(const key in regionMappings){
+
+        const val = regionMappings[key]
+
+        const hexagon = _CreateHexagon(HEX_H * SCALE)
+        const offset = OffsetToPosition(val)
+        hexagon.position.x = offset.x
+        hexagon.position.z = offset.z
+        scene.add(hexagon)
+    }
 }
 
 function _CreateHexagon(h){

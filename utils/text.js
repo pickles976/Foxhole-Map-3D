@@ -2,8 +2,7 @@ import * as THREE from 'three'
 import { FontLoader } from 'three/examples/loaders/FontLoader'
 import { TextGeometry } from 'three/examples/geometries/TextGeometry'
 import { regionMappings, regionNames } from './regions.js';
-import { HEX_H, HEX_W, RATIO, SCALE, MAP_SIZE } from './config.js';
-import { CreateHexagon } from './hexagon.js';
+import { OffsetToPosition } from './utils.js';
 
 const TEXT_Y = 512
 const TEXT_SIZE = 100
@@ -23,20 +22,18 @@ const meshMaterial = new THREE.MeshStandardMaterial ({
     emissiveIntensity: 5.0,
 })
 
-const spriteMaterial = new THREE.SpriteMaterial({
-    color: Math.random() * 0xffffff,
-})
-
 export function CreateLabels(scene){
 
     for(const key in regionMappings){
 
         const val = regionMappings[key]
-        // console.log(key, val)
+
+        const pos = OffsetToPosition(val)
+        pos.y = TEXT_Y
 
         _DrawText({
             scene,
-            position: _OffsetToPosition(val),
+            position: pos,
             text: regionNames[key],
             size: TEXT_SIZE,
             height:  0,
@@ -51,31 +48,6 @@ export function UpdateLabels(position){
         mesh.lookAt(position)
     })
 
-}
-
-//TODO: GET THIS OUT OF HERE
-export function CreateHexagons(scene){
-    for(const key in regionMappings){
-
-        const val = regionMappings[key]
-
-        const hexagon = CreateHexagon()
-        const offset = _OffsetToPosition(val)
-        hexagon.position.x = offset.x
-        hexagon.position.z = offset.z
-        scene.add(hexagon)
-    }
-}
-
-function _OffsetToPosition(offset){
-
-    let x = (MAP_SIZE / 2)
-    let z = (MAP_SIZE / RATIO / 2)
-
-    x += offset[1] * HEX_H * SCALE
-    z += offset[0] * HEX_W * SCALE
-
-    return new THREE.Vector3(x, TEXT_Y, z)
 }
 
 function _DrawText(params){

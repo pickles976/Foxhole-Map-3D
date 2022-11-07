@@ -3,7 +3,7 @@ import { Vector3 } from 'three';
 
 // set these in config
 const CHUNK_SIZE = 256
-const MIN_ZOOM = 1024
+const MIN_ZOOM = 768
 
 let leaves = []
 
@@ -37,9 +37,9 @@ function _QuadTree(xOffset, zOffset, size, position) {
 
     const center = new Vector3((xOffset * size) + (size / 2), 0, (zOffset * size) + (size / 2)) 
 
-    const currentLOD = Math.floor(Math.sqrt(position.distanceTo(center) / MIN_ZOOM))
+    const currentLOD = Math.round(Math.sqrt(position.distanceTo(center) / MIN_ZOOM))
 
-    const depth = Math.floor(Math.log(size / (CHUNK_SIZE / 2)))
+    const depth = Math.round(Math.log(size / (CHUNK_SIZE / 2)))
 
     // if the desired LOD is lower than our current depth (chunks of size 256 are the highest zoom level, aka LOD 0)
     if (currentLOD < depth) {

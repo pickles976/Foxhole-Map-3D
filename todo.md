@@ -19,8 +19,9 @@
 - [x] Script for generating tiles
 - [x] Share plane geometries for all meshes
 - [x] Fix the issue where Kalokai is cut off
-- [ ] Allow user to control resolution of images / detail of map
 - [ ] Total War cam 
+- [ ] Host tiles online
+- [ ] Host site online
 
 # Controls:
 
