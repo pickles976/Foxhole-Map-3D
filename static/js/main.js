@@ -1,8 +1,6 @@
 import * as THREE from 'three'
-// import { Vector3 } from 'three';
-import { FlyControls } from 'https://unpkg.com/three@0.146.0/examples/jsm/controls/FlyControls.js'
 import { MapControls } from 'https://unpkg.com/three@0.146.0/examples/jsm/controls/OrbitControls.js'
-// import { GUI } from 'lil-gui.module'
+// import { GUI } from 'https://unpkg.com/three@0.146.0/examples/jsm/libs/lil-gui.module.min.js'
 import { createGroundChunk } from './utils/mesh.js';
 import { TilesToRender } from './utils/quadtree.js';
 import { CreateLabels, UpdateLabels } from './utils/text.js';
@@ -18,6 +16,8 @@ function init() {
 
     // grab canvas
     canvas = document.querySelector('#c');
+
+    // renderer
     renderer = new THREE.WebGLRenderer({
         canvas,
         logarithmicDepthBuffer: true,
@@ -25,33 +25,26 @@ function init() {
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.5;
-    // document.body.appendChild( renderer.domElement );
-    // renderer.shadowMap.enabled = true;
+
+    // scene
     scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0xEBE2DB, 0.00003);
 
 
     // camera
-    camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 10, 2000000 );
+    camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 5, 2000000 );
     camera.position.set(MAP_SIZE / 2, 1024, MAP_SIZE / 2);
     camera.up.set(0, 1, 0);
     camera.lookAt(MAP_SIZE / 2, 0, MAP_SIZE / 2);
 
-    // controls = new FlyControls(camera, canvas);
-    // controls.movementSpeed = 100;
-    // controls.rollSpeed = Math.PI / 24;
-    // controls.autoForward = false;
-    // controls.dragToLook = true;
-    // controls.update(0.01);
-
+    // map controls
     controls = new MapControls(camera, canvas)
     controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
     controls.dampingFactor = 0.05;
     controls.screenSpacePanning = false;
     controls.minDistance = 10;
     controls.maxDistance = 16384;
-    controls.maxPolarAngle = Math.PI / 2;
-    controls.enablePan = true
+    controls.maxPolarAngle = (Math.PI / 2) - (Math.PI / 360)
 
 
     // lighting
@@ -80,7 +73,7 @@ function initSky() {
     skyUniforms[ 'mieDirectionalG' ].value = 0.8;
 
     const parameters = {
-        elevation: 52.5,
+        elevation: 30,
         azimuth: 56
     };
 

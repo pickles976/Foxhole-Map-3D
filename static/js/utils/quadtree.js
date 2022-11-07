@@ -83,6 +83,10 @@ function _GetLeaves(node){
 
 function _TraverseTree(node) {
 
+    if (node === undefined){
+        return
+    }
+
     if (node.leaf) {
         leaves.push(node)
     } 
