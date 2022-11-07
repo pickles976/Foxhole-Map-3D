@@ -11,15 +11,16 @@
 - [x] Replace fog with Sky shader
 - [x] water shader
 - [x] Make map labels billboard
-- [ ] Draw hexes (decals?)
+- [x] Draw hexes (decals?)
+- [ ] Fix/cleanup hex code 
 
 ### Improvements
 
 - [x] Script for generating tiles
 - [x] Share plane geometries for all meshes
 - [x] Fix the issue where Kalokai is cut off
-- [ ] Total War cam 
 - [ ] Allow user to control resolution of images / detail of map
+- [ ] Total War cam 
 
 # Controls:
 

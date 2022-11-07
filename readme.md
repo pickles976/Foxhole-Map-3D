@@ -1,25 +1,30 @@
+# WARNING:
+
+This project is a WIP, it's not super easy to set up yet or bug free.
+
 # How to use:
 
-Must have python installed
-
-1. Run
-
-```
-install.sh
-```
-
-2. Copy texture files from [here](www.google.com), copy them into the /preprocessing/resources folder
-
-3. Run 
+0. run
 
 ```bash
-generate.sh
+pip install ./preprocessing/requirements.txt
+npm install
 ```
 
-4. Run
+1. Copy the files from [here](www.google.com) into the preprocessing/resources folder
 
+2. run 
+```bash
+python heightmap_tiler.py
+python texture_tiler.py
 ```
+
+3. Copy the contents of preprocessing/quadmaps and preprocessing/texturemaps into resources
+
+4. run
+
+```bash
 http-server .
 ```
 
-5. In your browser, open up the provided url. Default is localhost:8080
+You should now be able to access the full map at localhost:8080

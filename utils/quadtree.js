@@ -1,6 +1,7 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.112.1/build/three.module.js';
 import { Vector3 } from 'three';
 
+// set these in config
 const CHUNK_SIZE = 256
 const MIN_ZOOM = 1024
 

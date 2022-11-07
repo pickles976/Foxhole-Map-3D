@@ -2,9 +2,11 @@ import * as THREE from 'three'
 import { FontLoader } from 'three/examples/loaders/FontLoader'
 import { TextGeometry } from 'three/examples/geometries/TextGeometry'
 import { regionMappings, regionNames } from './regions.js';
-import { HEX_H, HEX_W, RATIO, SCALE, MAP_SIZE } from './hex.js';
+import { HEX_H, HEX_W, RATIO, SCALE, MAP_SIZE } from './config.js';
+import { CreateHexagon } from './hexagon.js';
 
 const TEXT_Y = 512
+const TEXT_SIZE = 100
 
 // Materials
 
@@ -36,7 +38,7 @@ export function CreateLabels(scene){
             scene,
             position: _OffsetToPosition(val),
             text: regionNames[key],
-            size: 100,
+            size: TEXT_SIZE,
             height:  0,
         })
 
@@ -49,6 +51,20 @@ export function UpdateLabels(position){
         mesh.lookAt(position)
     })
 
+}
+
+//TODO: GET THIS OUT OF HERE
+export function CreateHexagons(scene){
+    for(const key in regionMappings){
+
+        const val = regionMappings[key]
+
+        const hexagon = CreateHexagon()
+        const offset = _OffsetToPosition(val)
+        hexagon.position.x = offset.x
+        hexagon.position.z = offset.z
+        scene.add(hexagon)
+    }
 }
 
 function _OffsetToPosition(offset){

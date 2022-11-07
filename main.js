@@ -5,10 +5,11 @@ import { FlyControls } from 'three/examples/jsm/controls/FlyControls'
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module'
 import { createGroundChunk } from './utils/mesh.js';
 import { TilesToRender } from './utils/quadtree.js';
-import { CreateLabels, UpdateLabels } from './utils/text.js';
+import { CreateHexagons, CreateLabels, UpdateLabels } from './utils/text.js';
 import { Water } from './utils/Water.js';
 import { Sky } from './utils/Sky.js'
-import { MAP_SIZE } from './utils/hex.js';
+import { MAP_SIZE } from './utils/config.js';
+import { CreateHexagon } from './utils/hexagon.js';
 
 let canvas, renderer, camera, scene, controls
 let sun, sky, water
@@ -52,9 +53,6 @@ function init() {
 
     const ambient = new THREE.AmbientLight(color, 0.3);
     scene.add(ambient);
-
-    const axesHelper = new THREE.AxesHelper( 5000 );
-    scene.add( axesHelper );
 
 }
 
@@ -103,12 +101,12 @@ function initSky() {
 
     // GUI
 
-    const gui = new GUI();
+    // const gui = new GUI();
 
-    const folderSky = gui.addFolder( 'Sky' );
-    folderSky.add( parameters, 'elevation', 0, 90, 0.1 ).onChange( updateSun );
-    folderSky.add( parameters, 'azimuth', - 180, 180, 0.1 ).onChange( updateSun );
-    folderSky.open();
+    // const folderSky = gui.addFolder( 'Sky' );
+    // folderSky.add( parameters, 'elevation', 0, 90, 0.1 ).onChange( updateSun );
+    // folderSky.add( parameters, 'azimuth', - 180, 180, 0.1 ).onChange( updateSun );
+    // folderSky.open();
 }
 
 function resizeRendererToDisplaySize(renderer) {
@@ -238,6 +236,7 @@ init()
 initWater()
 initSky()
 CreateLabels(scene)
+CreateHexagons(scene)
 UpdateTerrain()
 
 // console.log(text)

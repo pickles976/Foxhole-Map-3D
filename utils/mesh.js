@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { PLANE_SEGMENTS } from './hex.js';
+import { PLANE_SEGMENTS } from './config.js';
 
 const loader = new THREE.TextureLoader();
 
