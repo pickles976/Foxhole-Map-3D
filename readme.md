@@ -11,7 +11,7 @@ pip install ./preprocessing/requirements.txt
 npm install
 ```
 
-1. Copy the files from [here](www.google.com) into the preprocessing/resources folder
+1. Copy the files from [here](https://drive.google.com/drive/folders/1ExZoBcSPSC-mD5p6fPBCUR2JqJnnEMCo?usp=share_link) into the preprocessing/resources folder
 
 2. run 
 ```bash
