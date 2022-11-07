@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 // import { Vector3 } from 'three';
 import { FlyControls } from 'https://unpkg.com/three@0.146.0/examples/jsm/controls/FlyControls.js'
+import { MapControls } from 'https://unpkg.com/three@0.146.0/examples/jsm/controls/OrbitControls.js'
 // import { GUI } from 'lil-gui.module'
 import { createGroundChunk } from './utils/mesh.js';
 import { TilesToRender } from './utils/quadtree.js';
@@ -32,16 +33,26 @@ function init() {
 
     // camera
     camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 10, 2000000 );
-    camera.position.set(0, 1024, 0);
+    camera.position.set(MAP_SIZE / 2, 1024, MAP_SIZE / 2);
     camera.up.set(0, 1, 0);
     camera.lookAt(MAP_SIZE / 2, 0, MAP_SIZE / 2);
 
-    controls = new FlyControls(camera, canvas);
-    controls.movementSpeed = 100;
-    controls.rollSpeed = Math.PI / 24;
-    controls.autoForward = false;
-    controls.dragToLook = true;
-    controls.update(0.01);
+    // controls = new FlyControls(camera, canvas);
+    // controls.movementSpeed = 100;
+    // controls.rollSpeed = Math.PI / 24;
+    // controls.autoForward = false;
+    // controls.dragToLook = true;
+    // controls.update(0.01);
+
+    controls = new MapControls(camera, canvas)
+    controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+    controls.dampingFactor = 0.05;
+    controls.screenSpacePanning = false;
+    controls.minDistance = 10;
+    controls.maxDistance = 16384;
+    controls.maxPolarAngle = Math.PI / 2;
+    controls.enablePan = true
+
 
     // lighting
     const color = 0xFFFFFF;
@@ -119,10 +130,10 @@ function resizeRendererToDisplaySize(renderer) {
     return needResize;
 }
 
-async function render(time) {
+async function render() {
 
-    time *= 0.001;  // convert time to seconds
-    controls.update(0.1)
+    // controls.update(0.1)
+    controls.update()
 
     // fix buffer size
     if (resizeRendererToDisplaySize(renderer)) {
