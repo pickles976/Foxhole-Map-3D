@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import { Vector3 } from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { FlyControls } from 'three/examples/jsm/controls/FlyControls'
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module'
 import { createGroundChunk } from './utils/mesh.js';

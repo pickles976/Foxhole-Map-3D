@@ -12,19 +12,14 @@
 - [x] water shader
 - [x] Make map labels billboard
 - [x] Draw hexes (decals?)
-- [ ] Fix/cleanup hex code 
+- [x] Fix/cleanup hex code 
 
 ### Improvements
 
 - [x] Script for generating tiles
 - [x] Share plane geometries for all meshes
 - [x] Fix the issue where Kalokai is cut off
-- [ ] Total War cam 
-- [ ] Host tiles online
+- [x] Host tiles online
+- [ ] Organize into static project
 - [ ] Host site online
-
-# Controls:
-
-WASD - move forward, backwards, left and right
-arrows - look up down left right
-QE - roll
+- [ ] Total War cam 
