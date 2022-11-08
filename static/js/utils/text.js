@@ -3,9 +3,7 @@ import { FontLoader } from 'https://unpkg.com/three@0.146.0/examples/jsm/loaders
 import { TextGeometry } from 'https://unpkg.com/three@0.146.0/examples/jsm/geometries/TextGeometry.js'
 import { regionMappings, regionNames } from './regions.js';
 import { OffsetToPosition } from './utils.js';
-
-const TEXT_Y = 512
-const TEXT_SIZE = 100
+import { TEXT_SIZE, TEXT_Y } from './config.js';
 
 // Materials
 

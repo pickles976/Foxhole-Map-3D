@@ -1,8 +1,5 @@
 import { Vector3 } from 'three';
-
-// set these in config
-const CHUNK_SIZE = 256
-const MIN_ZOOM = 768
+import { CHUNK_SIZE, MIN_ZOOM } from './config.js';
 
 let leaves = []
 
