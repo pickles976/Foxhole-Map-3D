@@ -59,59 +59,6 @@ function init() {
 
 }
 
-function initSky() {
-
-     sky = new Sky();
-    sky.scale.setScalar( 100000 );
-    scene.add( sky );
-
-    const skyUniforms = sky.material.uniforms;
-
-    skyUniforms[ 'turbidity' ].value = 10;
-    skyUniforms[ 'rayleigh' ].value = 2;
-    skyUniforms[ 'mieCoefficient' ].value = 0.005;
-    skyUniforms[ 'mieDirectionalG' ].value = 0.8;
-
-    const parameters = {
-        elevation: 30,
-        azimuth: 56
-    };
-
-    const pmremGenerator = new THREE.PMREMGenerator( renderer );
-    let renderTarget;
-
-    sun = new THREE.Vector3();
-
-    function updateSun() {
-
-        const phi = THREE.MathUtils.degToRad( 90 - parameters.elevation );
-        const theta = THREE.MathUtils.degToRad( parameters.azimuth );
-
-        sun.setFromSphericalCoords( 1, phi, theta );
-
-        sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
-        water.material.uniforms[ 'sunDirection' ].value.copy( sun ).normalize();
-
-        if ( renderTarget !== undefined ) renderTarget.dispose();
-
-        renderTarget = pmremGenerator.fromScene( sky );
-
-        scene.environment = renderTarget.texture;
-
-    }
-
-    updateSun();
-
-    // GUI
-
-    // const gui = new GUI();
-
-    // const folderSky = gui.addFolder( 'Sky' );
-    // folderSky.add( parameters, 'elevation', 0, 90, 0.1 ).onChange( updateSun );
-    // folderSky.add( parameters, 'azimuth', - 180, 180, 0.1 ).onChange( updateSun );
-    // folderSky.open();
-}
-
 function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
     const width = canvas.clientWidth;
@@ -149,6 +96,59 @@ async function render() {
     UpdateLabels(camera.position)
     
     requestAnimationFrame(render)
+}
+
+function initSky() {
+
+    sky = new Sky();
+   sky.scale.setScalar( 100000 );
+   scene.add( sky );
+
+   const skyUniforms = sky.material.uniforms;
+
+   skyUniforms[ 'turbidity' ].value = 10;
+   skyUniforms[ 'rayleigh' ].value = 2;
+   skyUniforms[ 'mieCoefficient' ].value = 0.005;
+   skyUniforms[ 'mieDirectionalG' ].value = 0.8;
+
+   const parameters = {
+       elevation: 30,
+       azimuth: 56
+   };
+
+   const pmremGenerator = new THREE.PMREMGenerator( renderer );
+   let renderTarget;
+
+   sun = new THREE.Vector3();
+
+   function updateSun() {
+
+       const phi = THREE.MathUtils.degToRad( 90 - parameters.elevation );
+       const theta = THREE.MathUtils.degToRad( parameters.azimuth );
+
+       sun.setFromSphericalCoords( 1, phi, theta );
+
+       sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
+       water.material.uniforms[ 'sunDirection' ].value.copy( sun ).normalize();
+
+       if ( renderTarget !== undefined ) renderTarget.dispose();
+
+       renderTarget = pmremGenerator.fromScene( sky );
+
+       scene.environment = renderTarget.texture;
+
+   }
+
+   updateSun();
+
+   // GUI
+
+   // const gui = new GUI();
+
+   // const folderSky = gui.addFolder( 'Sky' );
+   // folderSky.add( parameters, 'elevation', 0, 90, 0.1 ).onChange( updateSun );
+   // folderSky.add( parameters, 'azimuth', - 180, 180, 0.1 ).onChange( updateSun );
+   // folderSky.open();
 }
 
 function initWater() {
@@ -243,7 +243,5 @@ initSky()
 CreateLabels(scene)
 CreateHexagons(scene)
 UpdateTerrain()
-
-// console.log(text)
 
 requestAnimationFrame(render)

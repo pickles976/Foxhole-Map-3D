@@ -1,10 +1,9 @@
 import * as THREE from 'three'
-import { HEX_H, SCALE } from './config.js';
+import { HEX_H, HEX_HEIGHT, SCALE } from './config.js';
 import { regionMappings, regionNames } from './regions.js';
 import { OffsetToPosition } from './utils.js';
 
 const SIDES = 6
-const HEIGHT = 100
 
 const meshMaterial = new THREE.MeshPhongMaterial ({
     color: 0xffffff,
@@ -16,7 +15,6 @@ const meshMaterial = new THREE.MeshPhongMaterial ({
     emissiveIntensity: 5.0,
 })
 
-//TODO: GET THIS OUT OF HERE
 export function CreateHexagons(scene){
     for(const key in regionMappings){
 
@@ -39,7 +37,7 @@ function _CreateHexagon(h){
 
     for(let i = 0; i < SIDES; i++){
 
-        const side = new THREE.PlaneGeometry(sideLength, HEIGHT, 2, 2);
+        const side = new THREE.PlaneGeometry(sideLength, HEX_HEIGHT, 2, 2);
         const theta = i * (2 * Math.PI / SIDES)
 
         side.rotateY(theta)
